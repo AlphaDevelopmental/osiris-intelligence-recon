@@ -12,10 +12,19 @@ from collections import deque
 from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
+from urllib.parse import urlsplit
 
 from . import registry as reg
 from .api_client import STATUS_UNAVAILABLE, ApiResult, OsirisClient
-from .correlation import c2_finding, hudsonrock_finding, kev_tech_finding, otx_finding, sanctions_finding, spf_findings
+from .correlation import (
+    c2_finding,
+    hudsonrock_counts,
+    hudsonrock_finding,
+    kev_tech_finding,
+    otx_finding,
+    sanctions_finding,
+    spf_findings,
+)
 from .discovery import AssetInventory, DnsParse, parse_certs, parse_dns
 from .http_analysis import (
     OSIRIS_WHOIS_HEADERS,
@@ -546,20 +555,26 @@ class ReconPipeline:
                 "/api/osint/hudsonrock", {"query": hr_query[1], "type": hr_query[0]}, "infostealer exposure"
             )
             if res and res.ok and isinstance(res.data, dict):
+                counts = hudsonrock_counts(res.data) if t.kind == "domain" else {}
                 self.state.intel["hudsonrock"] = {
-                    k: res.data.get(k)
-                    for k in (
-                        "call",
-                        "compromised",
-                        "totalStealers",
-                        "employees",
-                        "users",
-                        "third_parties",
-                        "total_corporate_services",
-                        "total_user_services",
-                    )
+                    "call": self.ref(res),
+                    **{k: res.data.get(k) for k in ("employees", "users", "third_parties")},
+                    **counts,
+                    "osiris_compromised_flag": res.data.get("compromised"),
+                    "note": "`total` is per-domain; `totalStealers` (Hudson Rock corpus size) is ignored.",
                 }
-                self.state.intel["hudsonrock"]["call"] = self.ref(res)
+                for u in counts.get("urls", []):
+                    host = urlsplit(u["url"]).hostname or ""
+                    if host and self.inv.relation_for_host(host) == FIRST_PARTY:
+                        self.inv.add(
+                            host,
+                            "hostname",
+                            FIRST_PARTY,
+                            f"hudsonrock:{self.ref(res)}",
+                            t.value,
+                            1,
+                            "seen in Hudson Rock login URLs; discovered after the DNS stage, not resolved",
+                        )
                 if t.kind == "domain":
                     f = hudsonrock_finding(t.value, res.data, self.ref(res))
                     if f:

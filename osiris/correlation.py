@@ -35,22 +35,52 @@ def c2_finding(ip: str, rows: list[dict[str, Any]], endpoint: str, ref: str) -> 
     )
 
 
+def _int(value: Any) -> int:
+    try:
+        return int(value or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def hudsonrock_counts(data: dict[str, Any]) -> dict[str, Any]:
+    """Domain-specific counts from a Hudson Rock domain response.
+
+    `total` is the per-domain count. `totalStealers` is the size of Hudson Rock's whole
+    corpus (tens of millions, identical for every query), so it is never used — which also
+    means OSIRIS's own `compromised` flag (totalStealers > 0) is meaningless for domains.
+    """
+    employees = _int(data.get("employees"))
+    users = _int(data.get("users"))
+    third = _int(data.get("third_parties"))
+    total = _int(data.get("total")) or employees + users + third
+    urls = []
+    for row in (data.get("data") or {}).get("all_urls") or []:
+        if isinstance(row, dict) and row.get("url"):
+            urls.append({"url": str(row["url"]), "type": row.get("type"), "occurrence": _int(row.get("occurrence"))})
+    return {"total": total, "employees": employees, "users": users, "third_parties": third, "urls": urls}
+
+
 def hudsonrock_finding(domain: str, data: dict[str, Any], ref: str) -> Finding | None:
-    total = int(data.get("totalStealers") or data.get("total") or 0)
+    c = hudsonrock_counts(data)
+    total, employees, users, third = c["total"], c["employees"], c["users"], c["third_parties"]
     if total <= 0:
         return None
-    employees = int(data.get("employees") or 0)
-    users = int(data.get("users") or 0)
-    third = int(data.get("third_parties") or 0)
+    url_text = "; ".join(f"{u['url']} ({u['type']}, {u['occurrence']})" for u in c["urls"][:10])
     return Finding(
         id="",
         title="Infostealer infections associated with the domain (Hudson Rock)",
         asset=domain,
-        observation=f"Hudson Rock reports {total} compromised machine(s) with credentials for this domain "
-        f"(employees: {employees}, users: {users}, third parties: {third}). Credentials themselves "
-        "were not retrieved; the upstream service redacts them.",
+        observation=f"Hudson Rock reports {total} infostealer-infected machine(s) holding credentials for this "
+        f"domain (employees: {employees}, users: {users}, third parties: {third})."
+        + (f" Affected login URLs: {url_text}." if url_text else "")
+        + " Credentials themselves were not retrieved; the upstream service redacts them.",
         evidence=[
-            Evidence("GET /api/osint/hudsonrock", ref, f"totalStealers={total}; employees={employees}; users={users}")
+            Evidence(
+                "GET /api/osint/hudsonrock",
+                ref,
+                f"total={total}; employees={employees}; users={users}; third_parties={third}"
+                + (f"; urls={url_text}" if url_text else ""),
+            )
         ],
         confidence="medium",
         impact="Stolen session cookies or passwords for the organisation's services may be in criminal "

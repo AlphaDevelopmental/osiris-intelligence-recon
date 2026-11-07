@@ -89,12 +89,18 @@ def test_recon_mode_endpoint_selection():
 
 
 def test_intelligence_mode_uses_correct_hudsonrock_params_and_correlates():
-    state, session, _ = run("example.com", mode="intelligence")
+    state, session, pipe = run("example.com", mode="intelligence")
     assert session.calls_to("/api/osint/hudsonrock") == [{"query": "example.com", "type": "domain"}]
     assert {"query": "example.com"} in session.calls_to("/api/osint/threats")
     titles = {f.title for f in state.findings}
     assert "Target address listed in a malware C2 feed" in titles  # 93.184.215.20 in feed fixture
     assert "Infostealer infections associated with the domain (Hudson Rock)" in titles
+    hr = next(f for f in state.findings if "Hudson Rock" in f.title)
+    assert "reports 4 " in hr.observation and "37218725" not in hr.observation + hr.evidence[0].excerpt
+    assert "https://portal.example.com" in hr.observation and hr.severity == "high"
+    assert state.intel["hudsonrock"]["total"] == 4
+    assert pipe.inv.get("hostname", "portal.example.com").sources[0].startswith("hudsonrock:")
+    assert pipe.inv.get("hostname", "sso.thirdparty.example.net") is None  # out-of-domain URL not added
     c2 = next(f for f in state.findings if "C2" in f.title)
     assert c2.asset == "93.184.215.20" and c2.verification == "unverified"
     assert "203.0.113.200" not in {f.asset for f in state.findings}

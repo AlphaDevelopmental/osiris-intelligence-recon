@@ -129,7 +129,25 @@ SHODAN = {
 BGP = {"query": "93.184.215.14", "type": "ip", "ip": {"asn": {"asn": 64500, "name": "EXAMPLE-NET"}}}
 BGP_ASN = {"query": "AS64500", "type": "asn", "asn": {"asn": 64500, "name": "EXAMPLE-NET"}}
 THREATS = {"timestamp": "x", "otx": {"pulse_count": 2}, "threat_level": "MEDIUM", "tor_exit_node": False}
-HUDSON = {"query": "example.com", "type": "domain", "compromised": True, "totalStealers": 4, "employees": 1, "users": 3}
+# Real domain-response shape (2026-11-07): `total` is per-domain, `totalStealers` is the whole corpus.
+HUDSON = {
+    "query": "example.com",
+    "type": "domain",
+    "compromised": True,
+    "total": 4,
+    "totalStealers": 37218725,
+    "employees": 1,
+    "users": 3,
+    "third_parties": 0,
+    "data": {
+        "employees_urls": [],
+        "clients_urls": [{"occurrence": 3, "type": "User", "url": "https://portal.example.com"}],
+        "all_urls": [
+            {"url": "https://portal.example.com", "type": "User", "occurrence": 3},
+            {"url": "https://sso.thirdparty.example.net/login", "type": "Employee", "occurrence": 1},
+        ],
+    },
+}
 CYBER_ATTACKS = {
     "indicators": [
         {
