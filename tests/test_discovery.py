@@ -85,6 +85,17 @@ def test_root_domain_is_one_asset_however_reached():
     assert roots[0].sources == ["input", "cname:www.example.com", "dns:C1"]
 
 
+def test_cdn_provider_matches_edge_asns_only():
+    from osiris.intelligence import cdn_provider
+
+    assert cdn_provider({"asn": 13335}) == ("Cloudflare", 13335)
+    assert cdn_provider({"as_number": "AS54113 Fastly, Inc."}) == ("Fastly", 54113)
+    assert cdn_provider({"asn": None, "as_number": "as20940 Akamai"}) == ("Akamai", 20940)
+    assert cdn_provider({"asn": 16509, "as_number": "AS16509 Amazon.com"}) is None  # general cloud: not a CDN edge
+    assert cdn_provider({"as_number": "AS22612 Namecheap, Inc."}) is None
+    assert cdn_provider({}) is None
+
+
 def test_inventory_ipv6_and_timestamps():
     inv = AssetInventory(None)
     a = inv.add_ip("2001:4860:4860::8888", TARGET, "input", None, 0)

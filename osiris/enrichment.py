@@ -34,7 +34,7 @@ from .http_analysis import (
     observation_record,
     parse_raw_headers,
 )
-from .intelligence import c2_matches, cves_from_index, index_findings, kev_matches
+from .intelligence import c2_matches, cdn_provider, cves_from_index, index_findings, kev_matches
 from .models import (
     EXECUTED,
     FAILED,
@@ -48,6 +48,7 @@ from .models import (
     THIRD_PARTY,
     UNAVAILABLE,
     EndpointExecution,
+    Evidence,
     Finding,
     utcnow,
 )
@@ -203,6 +204,7 @@ class ReconPipeline:
         self.state.inventory = self.inv
         self.dns: dict[str, DnsParse] = {}
         self.index: dict[str, tuple[str, str, dict[str, Any]]] = {}  # ip -> (endpoint, call_id, payload)
+        self.cdn_edges: dict[str, dict[str, Any]] = {}  # ip -> provider, asn, how detected, OTX pulses
         self.kev_ids: set[str] = set()
         self.kev_payload: dict[str, Any] | None = None
         self._kev_ref = ""
@@ -492,14 +494,23 @@ class ReconPipeline:
                 if res and res.ok:
                     asn = ((res.data or {}).get("ip") or {}).get("asn") or {}
                     summary.update(asn=asn.get("asn"), asn_name=asn.get("name"), bgp_call=self.ref(res))
+            cdn = cdn_provider(summary)
+            if cdn:
+                self._mark_cdn(a, cdn[0], cdn[1], "ASN")
             if intel:
                 if v4:
                     res = self.call("/api/osint/threats", {"query": ip}, "OTX reputation / Tor exit")
                     if res and res.ok and isinstance(res.data, dict):
                         summary["threat_level"] = res.data.get("threat_level")
-                        f = otx_finding(ip, res.data, self.ref(res))
-                        if f:
-                            self.state.findings.append(f)
+                        if cdn:
+                            # Shared edge address: pulses concern the provider's other customers.
+                            pulses = int(((res.data.get("otx") or {}).get("pulse_count")) or 0)
+                            self.cdn_edges[ip]["otx_pulses"] = pulses
+                            self.cdn_edges[ip]["otx_call"] = self.ref(res)
+                        else:
+                            f = otx_finding(ip, res.data, self.ref(res))
+                            if f:
+                                self.state.findings.append(f)
                 res = self.call("/api/osint/portscan", {"target": ip}, "Shodan host record")
                 if res and res.ok and isinstance(res.data, dict):
                     summary["portscan_source"] = res.data.get("source")
@@ -509,7 +520,17 @@ class ReconPipeline:
                 if res and res.ok and isinstance(res.data, dict):
                     summary["graph_nodes"] = len(res.data.get("nodes") or [])
             a.enriched = True
-            self.state.intel["ips"][ip] = summary
+            self.state.intel["ips"][ip] = {**summary, **self.state.intel["ips"].get(ip, {})}
+        # Addresses with no ASN data (IPv6 here) inherit CDN status from a sibling address of the same host.
+        cdn_hosts = {self._parent_of(e): (v["provider"], v["asn"]) for e, v in self.cdn_edges.items()}
+        cdn_hosts.pop(None, None)
+        for a in ips:
+            if a.value not in self.cdn_edges and a.parent in cdn_hosts:
+                summary = self.state.intel["ips"][a.value]
+                if not cdn_provider(summary) and not summary.get("asn") and not summary.get("as_number"):
+                    provider, asn = cdn_hosts[a.parent]
+                    self._mark_cdn(a, provider, asn, f"inferred from a sibling address of {a.parent}")
+        self._cdn_findings()
         if not any(a.kind == "ipv4" for a in ips):
             self.tracker.note(
                 reg.get("/api/osint/bgp"), "Only IPv6 addresses found; upstream BGP route accepts IPv4/ASN."
@@ -517,6 +538,61 @@ class ReconPipeline:
             self.tracker.note(
                 reg.get("/api/osint/threats"), "Only IPv6 addresses found; upstream treats IPv6 as a domain."
             )
+
+    def _mark_cdn(self, asset: Any, provider: str, asn: int, how: str) -> None:
+        self.cdn_edges[asset.value] = {"provider": provider, "asn": asn, "detected_by": how}
+        self.state.intel["ips"].setdefault(asset.value, {})["cdn"] = f"{provider} (AS{asn}, {how})"
+        note = (
+            f"CDN edge address ({provider}, AS{asn}; {how}): shared by the provider's customers, so IP "
+            "reputation and index data are not attributed to the target"
+        )
+        if note not in asset.notes:
+            asset.notes.append(note)
+
+    def _cdn_findings(self) -> None:
+        by_provider: dict[tuple[str, int], list[str]] = {}
+        for ip, v in self.cdn_edges.items():
+            by_provider.setdefault((v["provider"], v["asn"]), []).append(ip)
+        for (provider, asn), edge_ips in by_provider.items():
+            hosts = sorted({p for ip in edge_ips for p in [self._parent_of(ip)] if p})
+            pulses = [
+                f"{ip}: {self.cdn_edges[ip]['otx_pulses']} OTX pulse(s)"
+                for ip in edge_ips
+                if "otx_pulses" in self.cdn_edges[ip]
+            ]
+            refs = [self.cdn_edges[ip].get("otx_call") for ip in edge_ips if self.cdn_edges[ip].get("otx_call")]
+            self.state.findings.append(
+                Finding(
+                    id="",
+                    title=f"Host(s) served through the {provider} CDN",
+                    asset=", ".join(hosts) or ", ".join(edge_ips),
+                    observation=f"{', '.join(hosts) or 'Target'} resolve(s) to {provider} edge addresses "
+                    f"(AS{asn}): {', '.join(edge_ips)}. These addresses are shared by many {provider} customers, "
+                    "so IP reputation, Shodan index ports/CVEs and threat-feed hits for them describe the edge "
+                    "network, not the target, and are not reported as target findings."
+                    + (f" Unattributed reputation data: {'; '.join(pulses)}." if pulses else ""),
+                    evidence=[
+                        Evidence(
+                            "osint/bgp + osint/ip",
+                            ", ".join(refs) or "ASN lookup",
+                            "; ".join(f"{ip} → {self.cdn_edges[ip]['detected_by']}" for ip in edge_ips),
+                        )
+                    ],
+                    confidence="high",
+                    impact="The origin server's address and exposure are hidden from passive IP lookups; the "
+                    "CDN may also provide filtering. Origin exposure was not assessed.",
+                    severity="informational",
+                    severity_justification="Architecture context, not a weakness.",
+                    remediation="Ensure the origin accepts HTTP(S) only from the CDN's published ranges, and "
+                    "assess the origin directly (with authorization) for a complete picture.",
+                    verification="observed",
+                    category="infrastructure",
+                )
+            )
+
+    def _parent_of(self, ip: str) -> str | None:
+        a = self.inv.get("ipv6" if ":" in ip else "ipv4", ip)
+        return a.parent if a else None
 
     def _enrich_asns(self) -> None:
         asns: list[str] = []
@@ -709,6 +785,8 @@ class ReconPipeline:
 
     def _index_findings(self) -> None:
         for ip, (endpoint, ref, payload) in self.index.items():
+            if ip in self.cdn_edges:
+                continue  # the index describes the CDN edge, not the target
             self.state.findings.extend(index_findings(ip, payload, ref, endpoint, self.cve_details, self.kev_ids))
 
 

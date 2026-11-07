@@ -115,6 +115,55 @@ def test_intelligence_mode_uses_correct_hudsonrock_params_and_correlates():
     assert idx.severity == "medium" and "KEV" in idx.severity_justification
 
 
+def cdn_routes():
+    """portal.example.com sits behind Cloudflare: one IPv4 (ASN-detectable) and one IPv6 (no ASN data)."""
+    from conftest import IP_INFO
+
+    routes = osiris_routes()
+    base_dns = routes["/api/osint/dns"]
+    edge4, edge6 = "104.16.0.1", "2606:4700::6810:1"
+
+    def dns(p):
+        if p.get("domain") == "portal.example.com":
+            return {"domain": "portal.example.com", "summary": {"ip_addresses": [edge4, edge6]}}
+        return base_dns(p)
+
+    def ip(p):
+        if p["ip"] == edge4:
+            return {**IP_INFO, "ip": edge4, "geo": {**IP_INFO["geo"], "as_number": "AS13335 Cloudflare, Inc."}}
+        if p["ip"] == edge6:
+            return {**IP_INFO, "ip": edge6, "geo": {"country": "United States"}}
+        return {**IP_INFO, "ip": p["ip"]}
+
+    def bgp(p):
+        if p.get("query") == edge4:
+            return {"query": edge4, "type": "ip", "ip": {"asn": {"asn": 13335, "name": "Cloudflare, Inc."}}}
+        return routes_bgp(p)
+
+    routes_bgp = routes["/api/osint/bgp"]
+    routes.update({"/api/osint/dns": dns, "/api/osint/ip": ip, "/api/osint/bgp": bgp})
+    return routes, edge4, edge6
+
+
+def test_cdn_edge_addresses_are_not_attributed_to_the_target():
+    routes, edge4, edge6 = cdn_routes()
+    state, session, pipe = run("example.com", routes=routes, mode="intelligence")
+    # both edge addresses were still looked up
+    assert {edge4, edge6} <= {p["ip"] for p in session.calls_to("/api/osint/ip")}
+    assert pipe.cdn_edges[edge4]["detected_by"] == "ASN"
+    assert pipe.cdn_edges[edge6]["detected_by"].startswith("inferred from a sibling address")
+    assert pipe.cdn_edges[edge4]["otx_pulses"] == 2
+    # no OTX or index (open port / CVE) findings for the shared edge
+    assert not [f for f in state.findings if f.asset in (edge4, edge6)]
+    cdn = [f for f in state.findings if f.title == "Host(s) served through the Cloudflare CDN"]
+    assert len(cdn) == 1 and cdn[0].asset == "portal.example.com" and cdn[0].severity == "informational"
+    assert f"{edge4}: 2 OTX pulse(s)" in cdn[0].observation
+    assert "CDN edge address (Cloudflare" in pipe.inv.get("ipv4", edge4).notes[0]
+    assert state.intel["ips"][edge4]["cdn"].startswith("Cloudflare (AS13335")
+    # a non-CDN address keeps its normal findings
+    assert any(f.asset == "93.184.215.14" and "open threat intelligence" in f.title for f in state.findings)
+
+
 def test_whois_headers_feed_http_analysis_without_target_contact():
     state, session, _ = run("example.com")
     php = next(f for f in state.findings if "end-of-life" in f.title)

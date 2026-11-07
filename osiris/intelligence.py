@@ -24,6 +24,31 @@ RISKY_PORTS = {
 }
 
 
+# ASNs used only for CDN / reverse-proxy edge networks. Their addresses are shared by many
+# customers, so IP reputation and index data describe the provider's edge, not the target.
+# General-purpose clouds (AWS, Google, Azure…) are excluded on purpose: an address there may
+# be the customer's own server.
+CDN_ASNS = {
+    13335: "Cloudflare",
+    209242: "Cloudflare",
+    20940: "Akamai",
+    16625: "Akamai",
+    54113: "Fastly",
+    19551: "Imperva",
+    30148: "Sucuri",
+}
+
+
+def cdn_provider(summary: dict[str, Any]) -> tuple[str, int] | None:
+    """(provider, asn) when an IP summary's ASN (from osint/bgp or osint/ip) belongs to a CDN edge network."""
+    for value in (summary.get("asn"), summary.get("as_number")):
+        m = re.match(r"^(?:AS)?(\d+)", str(value or ""), re.I)
+        if m and int(m.group(1)) in CDN_ASNS:
+            asn = int(m.group(1))
+            return CDN_ASNS[asn], asn
+    return None
+
+
 def c2_matches(ips: set[str], payload: dict[str, Any], list_key: str) -> list[dict[str, Any]]:
     """Return feed entries (from /api/cyber-attacks `indicators` or /api/malware `threats`) whose ip is in `ips`."""
     rows = payload.get(list_key) if isinstance(payload, dict) else None
