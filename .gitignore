@@ -1,0 +1,32 @@
+# Virtual environments / caches
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Credentials and private configuration
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets*
+
+# Engagement material: never commit scan output, scopes or authorizations
+reports/
+*_report.json
+recon_report.json
+plan.json
+dry_run.json
+active_audit.jsonl
+scope*.txt
+!examples/scope.example.txt
+authorization*
+engagement*/
+*.zip

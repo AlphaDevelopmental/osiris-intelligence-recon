@@ -1,0 +1,10 @@
+# Scope file for --mode active. One entry per line; '#' starts a comment.
+#   host.example.com       exact host
+#   *.example.com          any subdomain (NOT the apex — list it separately)
+#   192.0.2.10             single address
+#   192.0.2.0/28           CIDR
+#   !admin.example.com     exclusion (always wins)
+# Only list assets named in your written authorization.
+lab.example.com
+*.lab.example.com
+!payments.lab.example.com

@@ -1,0 +1,5 @@
+HTTP/2 200
+server: Apache
+x-powered-by: PHP/8.1.34
+link: <https://example.com/wp-json/>; rel="https://api.w.org/"
+content-type: text/html; charset=UTF-8

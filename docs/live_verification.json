@@ -1,0 +1,1183 @@
+{
+  "verified_at": "2026-11-07T06:50:45+00:00",
+  "base": "https://osirisai.live",
+  "upstream_commit_reviewed": "d974885468b0e29b8863253ded120a3dfd894275",
+  "results": {
+    "GET /api/health": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "checks_performed",
+            "detail",
+            "geocoder",
+            "platform",
+            "scope",
+            "status",
+            "timestamp",
+            "uptime_seconds",
+            "version"
+          ]
+        }
+      ]
+    },
+    "GET /api/stats": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "stats",
+            "timestamp"
+          ]
+        }
+      ]
+    },
+    "GET /api/flights": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "commercial_flights",
+            "gps_jamming",
+            "military_flights",
+            "private_flights",
+            "private_jets",
+            "providers",
+            "source",
+            "timestamp",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/satellites": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "category_counts",
+            "raw_count",
+            "satellites",
+            "source",
+            "timestamp",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/space-weather": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "alerts",
+            "kp_available",
+            "kp_index",
+            "kp_timestamp",
+            "solar_flares",
+            "storm_color",
+            "storm_level",
+            "timestamp"
+          ]
+        }
+      ]
+    },
+    "GET /api/earthquakes": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "earthquakes",
+            "timestamp",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/fires": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "fires",
+            "source",
+            "timestamp",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/weather": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "events",
+            "timestamp",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/air-quality": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "stations",
+            "timestamp",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/radar": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "outages",
+            "source",
+            "timestamp",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/sentinel": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "lat": "51.5072",
+            "lng": "-0.1276"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "bbox",
+            "datetime",
+            "scenes",
+            "source",
+            "timestamp",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/conflicts": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "activeWarzones",
+            "refreshInterval",
+            "sources",
+            "timestamp",
+            "totalHeadlines",
+            "totalZones",
+            "zoneSource",
+            "zones"
+          ]
+        }
+      ]
+    },
+    "GET /api/frontlines": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "frontlines",
+            "timestamp"
+          ]
+        }
+      ]
+    },
+    "GET /api/gdelt": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "events",
+            "source",
+            "timestamp",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/country-risk": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "countries",
+            "exchanges",
+            "methodology",
+            "open_exchanges",
+            "timestamp",
+            "total_exchanges"
+          ]
+        }
+      ]
+    },
+    "GET /api/region-dossier": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "lat": "48.3794",
+            "lng": "31.1656"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "attribution",
+            "coordinates",
+            "country",
+            "head_of_state",
+            "location",
+            "timestamp",
+            "wikipedia"
+          ]
+        }
+      ]
+    },
+    "GET /api/news": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "news",
+            "sources",
+            "timestamp",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/live-news": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "categories",
+            "feeds",
+            "timestamp",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/markets": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "commodities",
+            "count",
+            "crypto",
+            "fx",
+            "indices",
+            "oil",
+            "scm_alerts",
+            "stocks",
+            "timestamp"
+          ]
+        }
+      ]
+    },
+    "GET /api/crypto": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "list"
+          ]
+        }
+      ]
+    },
+    "GET /api/scm-suppliers": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "critical_count",
+            "degraded_signals",
+            "suppliers",
+            "timestamp",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/cctv": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "oversized",
+          "http": 200,
+          "degraded": false,
+          "error": "response exceeds 3000000 bytes"
+        }
+      ]
+    },
+    "GET /api/cctv/stream-status": {
+      "probes": [],
+      "not_probed": "makes the OSIRIS server fetch an arbitrary URL"
+    },
+    "GET /api/cctv/proxy": {
+      "probes": [],
+      "not_probed": "requires an allow-listed camera stream URL"
+    },
+    "GET /api/cctv/frame": {
+      "probes": [],
+      "not_probed": "requires a camera id"
+    },
+    "GET /api/infrastructure": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "infrastructure",
+            "timestamp",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/maritime": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "chokepoints",
+            "ports",
+            "ships",
+            "timestamp",
+            "total_chokepoints",
+            "total_ports",
+            "total_ships"
+          ]
+        }
+      ]
+    },
+    "GET /api/transit": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "invalid_request",
+          "http": 400,
+          "degraded": false,
+          "error": "bbox is required as west,south,east,north in degrees"
+        },
+        {
+          "probe": "retry",
+          "at": "2026-11-07T07:03:32+00:00",
+          "params": {
+            "coverage": "1"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "feeds",
+            "timestamp",
+            "total",
+            "withKey"
+          ]
+        }
+      ]
+    },
+    "GET /api/arcgis": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "invalid_request",
+          "http": 400,
+          "degraded": false,
+          "error": "Provide ?q=keyword or ?service=URL"
+        }
+      ]
+    },
+    "GET /api/proxy-tiles": {
+      "probes": [],
+      "not_probed": "requires a tile URL"
+    },
+    "GET /api/geo": {
+      "probes": [],
+      "not_probed": "would record the operator's own location"
+    },
+    "GET /api/cyber-threats": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "stats",
+            "threats",
+            "timestamp"
+          ]
+        }
+      ]
+    },
+    "GET /api/cyber-attacks": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "fetched_at",
+            "indicators",
+            "online",
+            "source",
+            "source_url",
+            "sources",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/malware": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "last_poll",
+            "source",
+            "stream",
+            "threats",
+            "timestamp",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/malware/stream": {
+      "probes": [
+        {
+          "probe": "stream-open",
+          "http": 200,
+          "content_type": "text/event-stream",
+          "first_bytes": 512,
+          "status": "success"
+        }
+      ]
+    },
+    "GET /api/osint/dns": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "domain": "example.com"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "domain",
+            "records",
+            "summary",
+            "timestamp"
+          ]
+        }
+      ]
+    },
+    "GET /api/osint/whois": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "domain": "example.com"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "domain",
+            "http",
+            "sanctions_match",
+            "security_score",
+            "timestamp"
+          ],
+          "documented_keys_missing": [
+            "rdap",
+            "registration",
+            "expiration"
+          ]
+        }
+      ]
+    },
+    "GET /api/osint/certs": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "domain": "example.com"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "certificates",
+            "domain",
+            "subdomains",
+            "timestamp",
+            "total_certs",
+            "unique_subdomains"
+          ]
+        }
+      ]
+    },
+    "GET /api/osint/ip": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "ip": "8.8.8.8"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "geo",
+            "ip",
+            "reputation",
+            "sanctions_match",
+            "timestamp"
+          ]
+        },
+        {
+          "probe": "documented-params",
+          "params": {
+            "ip": "2001:4860:4860::8888"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "ip",
+            "reputation",
+            "sanctions_match",
+            "timestamp"
+          ],
+          "documented_keys_missing": [
+            "geo"
+          ]
+        }
+      ]
+    },
+    "GET /api/osint/shodan": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "ip": "8.8.8.8"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "cpes",
+            "hostnames",
+            "ip",
+            "ports",
+            "tags",
+            "vulns"
+          ]
+        }
+      ]
+    },
+    "GET /api/osint/portscan": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "target": "8.8.8.8"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "cpes",
+            "domains",
+            "hostnames",
+            "ip",
+            "ports",
+            "source",
+            "tags",
+            "target",
+            "vulns"
+          ],
+          "documented_keys_missing": [
+            "note"
+          ]
+        }
+      ]
+    },
+    "GET /api/osint/bgp": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "query": "8.8.8.8"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "query",
+            "timestamp"
+          ],
+          "documented_keys_missing": [
+            "type",
+            "ip",
+            "asn",
+            "prefixes",
+            "peers"
+          ]
+        },
+        {
+          "probe": "documented-params",
+          "params": {
+            "query": "AS15169"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "asn",
+            "peers",
+            "prefixes",
+            "query",
+            "timestamp",
+            "type"
+          ],
+          "documented_keys_missing": [
+            "ip"
+          ]
+        }
+      ],
+      "legacy_param_probe": {
+        "probe": "previous-client-params",
+        "params": {
+          "ip": "8.8.8.8"
+        },
+        "status": "invalid_request",
+        "http": 400,
+        "degraded": false,
+        "error": "Missing query parameter (IP, ASN number, or prefix)"
+      }
+    },
+    "GET /api/osint/mac": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "mac": "00:1A:2B:3C:4D:5E"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "address",
+            "mac",
+            "prefix",
+            "vendor"
+          ]
+        }
+      ]
+    },
+    "GET /api/osint/phone": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "number": "+442071234567"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "country_code",
+            "international",
+            "lat",
+            "line_type",
+            "lng",
+            "national",
+            "number",
+            "query",
+            "region",
+            "region_code",
+            "valid"
+          ]
+        }
+      ],
+      "legacy_param_probe": {
+        "probe": "previous-client-params",
+        "params": {
+          "phone": "+442071234567"
+        },
+        "status": "invalid_request",
+        "http": 400,
+        "degraded": false,
+        "error": "Missing phone parameter"
+      }
+    },
+    "GET /api/osint/github": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "user": "torvalds"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "avatar_url",
+            "bio",
+            "blog",
+            "company",
+            "created_at",
+            "email",
+            "followers",
+            "location",
+            "name",
+            "public_repos",
+            "recent_repos",
+            "twitter",
+            "username"
+          ]
+        }
+      ],
+      "legacy_param_probe": {
+        "probe": "previous-client-params",
+        "params": {
+          "username": "torvalds"
+        },
+        "status": "invalid_request",
+        "http": 400,
+        "degraded": false,
+        "error": "Missing username parameter"
+      }
+    },
+    "GET /api/osint/leaks": {
+      "probes": [],
+      "not_probed": "takes a personal email address; not exercised with real data"
+    },
+    "GET /api/osint/hudsonrock": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "query": "example.com",
+            "type": "domain"
+          },
+          "status": "upstream_error",
+          "http": 504,
+          "degraded": false,
+          "error": "The origin web server did not respond to Cloudflare within the allowed time. This typically means the origin is overloaded or a backend process is taking too long."
+        },
+        {
+          "probe": "retry",
+          "at": "2026-11-07T07:03:32+00:00",
+          "params": {
+            "query": "example.com",
+            "type": "domain"
+          },
+          "status": "upstream_error",
+          "http": 504,
+          "degraded": false,
+          "error": "The origin web server did not respond to Cloudflare within the allowed time. This typically means the origin is overloaded or a backend process is taking too long."
+        }
+      ],
+      "legacy_param_probe": {
+        "probe": "previous-client-params",
+        "params": {
+          "domain": "example.com"
+        },
+        "status": "invalid_request",
+        "http": 400,
+        "degraded": false,
+        "error": "Missing query parameter"
+      }
+    },
+    "GET /api/osint/cve": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "cve": "CVE-2021-44228"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "affected",
+            "cvss",
+            "cvss_vector",
+            "cwe",
+            "description",
+            "id",
+            "modified",
+            "published",
+            "references",
+            "severity",
+            "source"
+          ]
+        }
+      ],
+      "legacy_param_probe": {
+        "probe": "previous-client-params",
+        "params": {
+          "id": "CVE-2021-44228"
+        },
+        "status": "invalid_request",
+        "http": 400,
+        "degraded": false,
+        "error": "Missing cve parameter"
+      }
+    },
+    "GET /api/osint/sanctions": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "query": "Rosoboronexport",
+            "limit": "3"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "matches",
+            "query",
+            "schema",
+            "source",
+            "timestamp",
+            "total"
+          ]
+        }
+      ]
+    },
+    "GET /api/osint/threats": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "query": "8.8.8.8"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "otx",
+            "threat_level",
+            "timestamp",
+            "tor_exit_node"
+          ],
+          "documented_keys_missing": [
+            "pulses"
+          ]
+        },
+        {
+          "probe": "documented-params",
+          "params": {
+            "query": "example.com"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "threat_level",
+            "timestamp"
+          ],
+          "documented_keys_missing": [
+            "pulses",
+            "tor_exit_node",
+            "otx"
+          ]
+        }
+      ],
+      "legacy_param_probe": {
+        "probe": "previous-client-params",
+        "params": {
+          "indicator": "8.8.8.8"
+        },
+        "status": "success",
+        "http": 200,
+        "degraded": false,
+        "keys": [
+          "threat_level",
+          "timestamp"
+        ]
+      }
+    },
+    "GET /api/osint/sweep": {
+      "probes": [],
+      "not_probed": "docs describe host sweeping; not called against third-party space (source-verified only)"
+    },
+    "GET /api/scanner": {
+      "probes": [
+        {
+          "probe": "config-check-without-target",
+          "http": 429,
+          "status": "other",
+          "error": "Rate limit exceeded"
+        },
+        {
+          "probe": "config-check-without-target (retry)",
+          "at": "2026-11-07T07:03:32+00:00",
+          "http": 400,
+          "status": "invalid_request",
+          "error": "Missing target parameter"
+        }
+      ]
+    },
+    "GET /api/entity/expand": {
+      "probes": [
+        {
+          "probe": "documented-params",
+          "params": {
+            "type": "ip",
+            "id": "8.8.8.8"
+          },
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "degraded",
+            "entity",
+            "links",
+            "nodes",
+            "sanctions_index_size",
+            "source",
+            "timestamp",
+            "wikidata_cache_hits"
+          ]
+        }
+      ]
+    },
+    "POST /api/ai/analyze": {
+      "probes": [],
+      "not_probed": "POST ai: not invoked by policy"
+    },
+    "POST /api/ai/briefing": {
+      "probes": [],
+      "not_probed": "POST ai: not invoked by policy"
+    },
+    "POST /api/ai/overview": {
+      "probes": [],
+      "not_probed": "POST ai: not invoked by policy"
+    },
+    "GET /api/oi": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "about",
+            "auth",
+            "credit",
+            "depths",
+            "endpoints",
+            "limits",
+            "name",
+            "providers",
+            "version"
+          ]
+        }
+      ]
+    },
+    "POST /api/oi/models": {
+      "probes": [],
+      "not_probed": "POST ai: not invoked by policy"
+    },
+    "POST /api/oi/runs": {
+      "probes": [],
+      "not_probed": "POST state-changing: not invoked by policy"
+    },
+    "GET /api/oi/runs/{id}": {
+      "probes": [],
+      "not_probed": "requires a run id from a paid POST /api/oi/runs"
+    },
+    "GET /api/oi/runs/{id}/events": {
+      "probes": [],
+      "not_probed": "GET stream: not invoked by policy"
+    },
+    "GET /api/oi/trending": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "items"
+          ]
+        }
+      ]
+    },
+    "POST /api/oi/assist": {
+      "probes": [],
+      "not_probed": "POST ai: not invoked by policy"
+    },
+    "POST /api/oi/runs/{id}/ask": {
+      "probes": [],
+      "not_probed": "POST ai: not invoked by policy"
+    },
+    "POST /api/oi/runs/{id}/inject": {
+      "probes": [],
+      "not_probed": "POST state-changing: not invoked by policy"
+    },
+    "DELETE /api/oi/runs/{id}": {
+      "probes": [],
+      "not_probed": "DELETE state-changing: not invoked by policy"
+    },
+    "POST /api/mcp": {
+      "probes": [],
+      "not_probed": "POST ai: not invoked by policy"
+    },
+    "POST /api/sdk/ingest": {
+      "probes": [],
+      "not_probed": "POST state-changing: not invoked by policy"
+    },
+    "GET /api/sdk/ingest": {
+      "probes": [
+        {
+          "probe": "no-params",
+          "params": {},
+          "status": "success",
+          "http": 200,
+          "degraded": false,
+          "keys": [
+            "entityCount",
+            "recentIngestions",
+            "sdk",
+            "timestamp",
+            "version"
+          ]
+        }
+      ]
+    },
+    "GET /api/sdk/stream": {
+      "probes": [
+        {
+          "probe": "stream-open",
+          "http": 200,
+          "content_type": "text/event-stream",
+          "first_bytes": 213,
+          "status": "success"
+        }
+      ]
+    },
+    "POST /api/github-webhook": {
+      "probes": [],
+      "not_probed": "POST state-changing: not invoked by policy"
+    }
+  }
+}
