@@ -99,7 +99,12 @@ def test_intelligence_mode_uses_correct_hudsonrock_params_and_correlates():
     assert "reports 4 " in hr.observation and "37218725" not in hr.observation + hr.evidence[0].excerpt
     assert "https://portal.example.com" in hr.observation and hr.severity == "high"
     assert state.intel["hudsonrock"]["total"] == 4
-    assert pipe.inv.get("hostname", "portal.example.com").sources[0].startswith("hudsonrock:")
+    portal = pipe.inv.get("hostname", "portal.example.com")
+    assert portal.sources[0].startswith("hudsonrock:") and portal.enriched
+    # late-found host is resolved and its address enriched like any other subdomain
+    assert {"domain": "portal.example.com"} in session.calls_to("/api/osint/dns")
+    assert "93.184.215.30" in {p["ip"] for p in session.calls_to("/api/osint/ip")}
+    assert pipe.inv.get("ipv4", "93.184.215.30").parent == "portal.example.com"
     assert pipe.inv.get("hostname", "sso.thirdparty.example.net") is None  # out-of-domain URL not added
     c2 = next(f for f in state.findings if "C2" in f.title)
     assert c2.asset == "93.184.215.20" and c2.verification == "unverified"

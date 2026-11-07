@@ -168,6 +168,9 @@ class AssetInventory:
         depth: int = 0,
         note: str | None = None,
     ) -> Asset:
+        # The root domain is one asset however it is reached (CNAME/MX/NS pointing back at it).
+        if self.root and value == self.root and kind in ("domain", "hostname", "mail_host", "nameserver"):
+            kind, relation = "domain", TARGET
         key = (kind, value)
         asset = self._assets.get(key)
         if asset is None:

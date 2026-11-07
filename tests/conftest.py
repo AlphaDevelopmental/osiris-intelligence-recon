@@ -213,7 +213,17 @@ class FakeSession:
 
 
 def osiris_routes() -> dict[str, Any]:
-    dns = {"example.com": DNS_ROOT, "www.example.com": DNS_WWW, "intranet.example.com": DNS_INTERNAL}
+    dns = {
+        "example.com": DNS_ROOT,
+        "www.example.com": DNS_WWW,
+        "intranet.example.com": DNS_INTERNAL,
+        # only named by Hudson Rock login URLs, not by CT
+        "portal.example.com": {
+            "domain": "portal.example.com",
+            "records": {"A": [{"name": "portal.example.com.", "type": 1, "data": "93.184.215.30"}]},
+            "summary": {"ip_addresses": ["93.184.215.30"]},
+        },
+    }
 
     def dns_handler(p):
         return dns.get(p.get("domain"), {"domain": p.get("domain"), "records": {}, "summary": {"ip_addresses": []}})

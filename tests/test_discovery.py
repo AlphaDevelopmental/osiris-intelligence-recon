@@ -74,6 +74,17 @@ def test_inventory_dedup_relation_and_private_exclusion():
     assert [a.value for a in lab.ips()] == ["10.0.0.5"]
 
 
+def test_root_domain_is_one_asset_however_reached():
+    inv = AssetInventory("example.com")
+    inv.add("example.com", "domain", TARGET, "input")
+    inv.add("example.com", "hostname", FIRST_PARTY, "cname:www.example.com", "www.example.com", 2)
+    inv.add("example.com", "mail_host", FIRST_PARTY, "dns:C1", "example.com", 1)
+    roots = [a for a in inv if a.value == "example.com"]
+    assert len(roots) == 1
+    assert roots[0].kind == "domain" and roots[0].relation == TARGET and roots[0].depth == 0
+    assert roots[0].sources == ["input", "cname:www.example.com", "dns:C1"]
+
+
 def test_inventory_ipv6_and_timestamps():
     inv = AssetInventory(None)
     a = inv.add_ip("2001:4860:4860::8888", TARGET, "input", None, 0)

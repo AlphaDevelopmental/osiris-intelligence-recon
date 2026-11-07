@@ -312,6 +312,14 @@ class ReconPipeline:
         else:
             self.tracker.note(reg.get("/api/osint/certs"), "--max-depth 0 disables subdomain discovery.")
 
+        # Hudson Rock login URLs can name subdomains CT missed; look them up before resolution
+        # so they get DNS and IP enrichment like any other first-party host.
+        if cfg.mode in ("intelligence", "all", "active"):
+            for host in self._hudsonrock():
+                if cfg.max_depth >= 1 and host not in queued:
+                    queue.append((host, 1, "hudsonrock"))
+                    queued.add(host)
+
         # first-party MX/NS hosts join the queue; third-party ones are recorded only
         for kind, hosts in (
             ("mail_host", dns_root.mx if dns_root else []),
@@ -536,6 +544,36 @@ class ReconPipeline:
             self.state.notes.append(f"{len(asns) - self.cfg.max_asns} ASN(s) not queried due to --max-asns.")
 
     # ── threat intelligence ──────────────────────────────────────────
+    def _hudsonrock(self) -> list[str]:
+        """Infostealer exposure lookup; returns first-party hosts named in affected login URLs."""
+        t = self.target
+        hr_query = {"domain": ("domain", t.value), "email": ("email", t.value), "phone": ("phone", t.value)}.get(t.kind)
+        if not hr_query:
+            return []
+        res = self.call("/api/osint/hudsonrock", {"query": hr_query[1], "type": hr_query[0]}, "infostealer exposure")
+        if not res or not res.ok or not isinstance(res.data, dict):
+            return []
+        counts = hudsonrock_counts(res.data) if t.kind == "domain" else {}
+        self.state.intel["hudsonrock"] = {
+            "call": self.ref(res),
+            **{k: res.data.get(k) for k in ("employees", "users", "third_parties")},
+            **counts,
+            "osiris_compromised_flag": res.data.get("compromised"),
+            "note": "`total` is per-domain; `totalStealers` (Hudson Rock corpus size) is ignored.",
+        }
+        hosts: list[str] = []
+        for u in counts.get("urls", []):
+            host = urlsplit(u["url"]).hostname or ""
+            if host and self.inv.relation_for_host(host) == FIRST_PARTY:
+                self.inv.add(host, "hostname", FIRST_PARTY, f"hudsonrock:{self.ref(res)}", t.value, 1)
+                if host not in hosts:
+                    hosts.append(host)
+        if t.kind == "domain":
+            f = hudsonrock_finding(t.value, res.data, self.ref(res))
+            if f:
+                self.state.findings.append(f)
+        return hosts
+
     def _intelligence(self) -> None:
         t = self.target
         if t.kind == "domain":
@@ -549,36 +587,8 @@ class ReconPipeline:
                 f = otx_finding(t.value, res.data, self.ref(res))
                 if f:
                     self.state.findings.append(f)
-        hr_query = {"domain": ("domain", t.value), "email": ("email", t.value), "phone": ("phone", t.value)}.get(t.kind)
-        if hr_query:
-            res = self.call(
-                "/api/osint/hudsonrock", {"query": hr_query[1], "type": hr_query[0]}, "infostealer exposure"
-            )
-            if res and res.ok and isinstance(res.data, dict):
-                counts = hudsonrock_counts(res.data) if t.kind == "domain" else {}
-                self.state.intel["hudsonrock"] = {
-                    "call": self.ref(res),
-                    **{k: res.data.get(k) for k in ("employees", "users", "third_parties")},
-                    **counts,
-                    "osiris_compromised_flag": res.data.get("compromised"),
-                    "note": "`total` is per-domain; `totalStealers` (Hudson Rock corpus size) is ignored.",
-                }
-                for u in counts.get("urls", []):
-                    host = urlsplit(u["url"]).hostname or ""
-                    if host and self.inv.relation_for_host(host) == FIRST_PARTY:
-                        self.inv.add(
-                            host,
-                            "hostname",
-                            FIRST_PARTY,
-                            f"hudsonrock:{self.ref(res)}",
-                            t.value,
-                            1,
-                            "seen in Hudson Rock login URLs; discovered after the DNS stage, not resolved",
-                        )
-                if t.kind == "domain":
-                    f = hudsonrock_finding(t.value, res.data, self.ref(res))
-                    if f:
-                        self.state.findings.append(f)
+        if t.kind in ("email", "phone"):
+            self._hudsonrock()
 
         # Global feeds used for correlation with discovered infrastructure.
         ips = {a.value for a in self.inv.ips(relations=(TARGET, HOSTING))}
